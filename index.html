@@ -5,8 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Coffee Table Flip</title>
   <style>
-    body { margin:0; background:#111; display:grid; place-items:center; min-height:100vh; }
-    #book { width:min(96vw, 1100px); height:min(90vh, 760px); }
+    html, body { margin: 0; height: 100%; background:#111; }
+    body { overflow: hidden; }
+    #book {
+      width: 100vw;
+      height: 100vh;
+    }
   </style>
 </head>
 <body>
@@ -15,21 +19,28 @@
   <script src="assets/page-flip.browser.js"></script>
   <script>
     const totalPages = 52;
+
     const images = Array.from({ length: totalPages }, (_, i) => {
-      const n = (i + 1).toString().padStart(2, "0");
-      return `pages/page-${n}.jpg`;
+      const n = String(i + 1).padStart(2, "0");
+      return `pages/page-${n}.jpg`; // change to .png if you export PNG later
     });
 
-    const pageFlip = new St.PageFlip(document.getElementById("book"), {
-      width: 550,
-      height: 760,
-      size: "stretch",
+    const el = document.getElementById("book");
+
+    const pageFlip = new St.PageFlip(el, {
+      width: 600,          // single page “design” size
+      height: 850,         // keep portrait ratio
+      size: "stretch",     // IMPORTANT: fit to #book
+      autoSize: true,      // IMPORTANT: recalc on resize
       showCover: true,
       mobileScrollSupport: false,
       maxShadowOpacity: 0.4
     });
 
     pageFlip.loadFromImages(images);
+
+    // make sure it recalculates after load (prevents cutoff on some screens)
+    window.addEventListener("resize", () => pageFlip.update());
   </script>
 </body>
 </html>
