@@ -7,26 +7,15 @@
   <style>
     html, body { margin:0; height:100%; background:#111; }
     body { display:grid; place-items:center; }
-
-    /* Single page container (portrait-friendly). Adjust max-width if you want bigger. */
-    #book{
-      width: min(92vw, 900px);
-      aspect-ratio: 1 / 1.414;   /* portrait ratio */
-      height: auto;
-    }
-
-    canvas { image-rendering: auto; }
+    #book { width:min(92vw, 900px); height:min(92vh, 900px); } /* big, responsive */
   </style>
 </head>
 <body>
   <div id="book"></div>
 
-  <script src="assets/page-flip.browser.js?v=2002"></script>
+  <script src="assets/page-flip.browser.js?v=3001"></script>
   <script>
-    // You had 52 spreads. After split = 104 pages.
     const spreads = 52;
-
-    // Build page list: L then R for each spread
     const images = [];
     for (let i = 1; i <= spreads; i++) {
       const n = String(i).padStart(2, "0");
@@ -36,42 +25,34 @@
 
     const el = document.getElementById("book");
 
-    // Probe first page to set a good fixed render size (reduces "pecah")
     const probe = new Image();
     probe.src = images[0];
     probe.onload = () => {
       const imgW = probe.naturalWidth;
       const imgH = probe.naturalHeight;
 
-      // Fit into container, snap scale to reduce fractional blur
+      // Fit single page into container (keep ratio)
       const rect = el.getBoundingClientRect();
       const scale = Math.min(rect.width / imgW, rect.height / imgH);
-      const snapped = Math.floor(scale * 100) / 100;
-
-      const w = Math.floor(imgW * snapped);
-      const h = Math.floor(imgH * snapped);
+      const w = Math.floor(imgW * scale);
+      const h = Math.floor(imgH * scale);
 
       const pageFlip = new St.PageFlip(el, {
         width: w,
         height: h,
-        size: "fixed",          // IMPORTANT: no stretching
+        size: "fixed",        // no stretch
         showCover: false,
-        mobileScrollSupport: false,
-        maxShadowOpacity: 0.35
+        maxShadowOpacity: 0.35,
+        mobileScrollSupport: false
       });
 
       pageFlip.loadFromImages(images);
 
-      // High-quality smoothing
-      setTimeout(() => {
-        document.querySelectorAll("canvas").forEach(c => {
-          const ctx = c.getContext("2d");
-          if (ctx) {
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = "high";
-          }
-        });
-      }, 200);
+      // FORCE ONE PAGE MODE (works in builds that support it)
+      if (typeof pageFlip.setDisplayMode === "function") {
+        pageFlip.setDisplayMode("single");
+      }
+      pageFlip.update();
     };
   </script>
 </body>
