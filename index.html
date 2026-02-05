@@ -5,17 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Coffee Table Flip</title>
   <style>
-    body {
-      margin:0;
-      background:#111;
-      display:grid;
-      place-items:center;
-      min-height:100vh;
-    }
-    #book {
-      width:min(96vw, 1100px);
-      height:min(90vh, 760px);
-    }
+    body { margin:0; background:#111; display:grid; place-items:center; min-height:100vh; }
+    #book { width:min(96vw, 1100px); height:min(90vh, 760px); }
   </style>
 </head>
 <body>
@@ -23,11 +14,9 @@
 
   <script src="assets/page-flip.browser.js"></script>
   <script>
-    const totalPages = 52; // YOUR PAGE COUNT
-
-    // Create filenames like: page-01.jpg, page-02.jpg ... page-52.jpg
+    const totalPages = 52;
     const images = Array.from({ length: totalPages }, (_, i) => {
-      const n = (i + 1).toString().padStart(2, "0"); // adds leading zero
+      const n = (i + 1).toString().padStart(2, "0");
       return `pages/page-${n}.jpg`;
     });
 
