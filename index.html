@@ -3,67 +3,66 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Square Flipbook</title>
+  <title>Flipbook</title>
   <style>
     html, body { margin:0; height:100%; background:#111; }
     body { display:grid; place-items:center; }
 
-    /* Square container */
-    #book {
+    /* Single page container (portrait-friendly). Adjust max-width if you want bigger. */
+    #book{
       width: min(92vw, 900px);
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 1 / 1.414;   /* portrait ratio */
       height: auto;
     }
 
-    /* Helps some browsers render sharper */
     canvas { image-rendering: auto; }
   </style>
 </head>
 <body>
   <div id="book"></div>
 
-  <script src="assets/page-flip.browser.js?v=1001"></script>
+  <script src="assets/page-flip.browser.js?v=2002"></script>
   <script>
-    const totalPages = 52;
+    // You had 52 spreads. After split = 104 pages.
+    const spreads = 52;
 
-    const images = Array.from({ length: totalPages }, (_, i) => {
-      const n = String(i + 1).padStart(2, "0");
-      return `pages/page-${n}.jpg`;
-    });
+    // Build page list: L then R for each spread
+    const images = [];
+    for (let i = 1; i <= spreads; i++) {
+      const n = String(i).padStart(2, "0");
+      images.push(`pages_split/page-${n}-L.jpg`);
+      images.push(`pages_split/page-${n}-R.jpg`);
+    }
 
     const el = document.getElementById("book");
 
-    // Load first image to get its real pixel size
+    // Probe first page to set a good fixed render size (reduces "pecah")
     const probe = new Image();
     probe.src = images[0];
     probe.onload = () => {
-      // Use the real image pixel size (square book expected)
       const imgW = probe.naturalWidth;
       const imgH = probe.naturalHeight;
 
-      // Fit inside container but avoid weird fractional scaling by snapping
+      // Fit into container, snap scale to reduce fractional blur
       const rect = el.getBoundingClientRect();
       const scale = Math.min(rect.width / imgW, rect.height / imgH);
+      const snapped = Math.floor(scale * 100) / 100;
 
-      // Snap to a clean scale step to reduce "pecah"
-      const snappedScale = Math.floor(scale * 100) / 100; // 2 decimal snap
-      const w = Math.floor(imgW * snappedScale);
-      const h = Math.floor(imgH * snappedScale);
+      const w = Math.floor(imgW * snapped);
+      const h = Math.floor(imgH * snapped);
 
-     const pages = [];
-
-for (let i = 1; i <= 52; i++) {
-  const n = String(i).padStart(2, "0");
-  pages.push(`pages_split/page-${n}-L.jpg`);
-  pages.push(`pages_split/page-${n}-R.jpg`);
-}
-
-const images = pages;
-const totalPages = images.length; // = 104
+      const pageFlip = new St.PageFlip(el, {
+        width: w,
+        height: h,
+        size: "fixed",          // IMPORTANT: no stretching
+        showCover: false,
+        mobileScrollSupport: false,
+        maxShadowOpacity: 0.35
+      });
 
       pageFlip.loadFromImages(images);
 
-      // After render, force high-quality smoothing
+      // High-quality smoothing
       setTimeout(() => {
         document.querySelectorAll("canvas").forEach(c => {
           const ctx = c.getContext("2d");
