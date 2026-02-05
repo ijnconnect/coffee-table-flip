@@ -7,57 +7,37 @@
   <style>
     html, body { margin:0; height:100%; background:#111; }
     body { display:grid; place-items:center; }
-
-    /* IMPORTANT: bounded container so pages stay big and not squeezed */
-    #book {
-      width: min(96vw, 900px);
-      height: min(92vh, 1200px);
-    }
+    #book { width:min(96vw, 900px); height:min(92vh, 1200px); }
   </style>
 </head>
 <body>
   <div id="book"></div>
 
-  <!-- cache-bust so GitHub Pages doesn't serve old JS -->
-  <script src="assets/page-flip.browser.js?v=3"></script>
+  <script src="assets/page-flip.browser.js?v=207"></script>
   <script>
     const totalPages = 52;
 
-    // page-01.jpg ... page-52.jpg
     const images = Array.from({ length: totalPages }, (_, i) => {
       const n = String(i + 1).padStart(2, "0");
       return `pages/page-${n}.jpg`;
     });
 
-    const el = document.getElementById("book");
-
-    const pageFlip = new St.PageFlip(el, {
-      width: 900,        // design size (single page)
-      height: 1273,      // ~A4 ratio (1 : 1.414)
+    const pageFlip = new St.PageFlip(document.getElementById("book"), {
+      width: 900,
+      height: 1273,
       size: "stretch",
       autoSize: true,
       showCover: false,
+      usePortrait: true,      // single page for portrait
       mobileScrollSupport: false,
       maxShadowOpacity: 0.35
     });
 
     pageFlip.loadFromImages(images);
 
-    // ✅ FORCE SINGLE PAGE MODE (works even if options don't)
-    function forceSingle() {
-      try {
-        if (typeof pageFlip.setDisplayMode === "function") {
-          pageFlip.setDisplayMode("single");
-        }
-        pageFlip.update();
-      } catch (e) {
-        console.log("forceSingle error:", e);
-      }
-    }
-
-    // run after initial render
-    setTimeout(forceSingle, 150);
-    window.addEventListener("resize", () => setTimeout(forceSingle, 100));
+    // Extra: force recalculation after load (prevents squeeze)
+    setTimeout(() => pageFlip.update(), 200);
+    window.addEventListener("resize", () => setTimeout(() => pageFlip.update(), 150));
   </script>
 </body>
 </html>
