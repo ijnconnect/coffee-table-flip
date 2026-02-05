@@ -3,10 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Flipbook</title>
+  <title>Coffee Table Flip</title>
   <style>
-    body { margin:0; background:#111; display:grid; place-items:center; min-height:100vh; }
-    #book { width:min(96vw, 1100px); height:min(90vh, 760px); }
+    body {
+      margin:0;
+      background:#111;
+      display:grid;
+      place-items:center;
+      min-height:100vh;
+    }
+    #book {
+      width:min(96vw, 1100px);
+      height:min(90vh, 760px);
+    }
   </style>
 </head>
 <body>
@@ -14,18 +23,21 @@
 
   <script src="assets/page-flip.browser.js"></script>
   <script>
-    // IMPORTANT: put correct number of pages here
-    const totalPages = 20; // <-- change this
+    const totalPages = 52; // YOUR PAGE COUNT
 
-    const images = Array.from({length: totalPages}, (_, i) => `pages/page-${i+1}.jpg`);
+    // Create filenames like: page-01.jpg, page-02.jpg ... page-52.jpg
+    const images = Array.from({ length: totalPages }, (_, i) => {
+      const n = (i + 1).toString().padStart(2, "0"); // adds leading zero
+      return `pages/page-${n}.jpg`;
+    });
 
     const pageFlip = new St.PageFlip(document.getElementById("book"), {
       width: 550,
       height: 760,
       size: "stretch",
       showCover: true,
-      maxShadowOpacity: 0.4,
-      mobileScrollSupport: false
+      mobileScrollSupport: false,
+      maxShadowOpacity: 0.4
     });
 
     pageFlip.loadFromImages(images);
