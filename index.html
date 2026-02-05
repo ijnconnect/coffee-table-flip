@@ -5,12 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Coffee Table Flip</title>
   <style>
-    html, body { margin: 0; height: 100%; background:#111; }
-    body { overflow: hidden; }
-    #book {
-      width: 100vw;
-      height: 100vh;
-    }
+    html, body { margin:0; height:100%; background:#111; }
+    #book { width:100vw; height:100vh; }
   </style>
 </head>
 <body>
@@ -22,24 +18,21 @@
 
     const images = Array.from({ length: totalPages }, (_, i) => {
       const n = String(i + 1).padStart(2, "0");
-      return `pages/page-${n}.jpg`; // change to .png if you export PNG later
+      return `pages/page-${n}.jpg`; // change to .png if you use PNG later
     });
 
-    const el = document.getElementById("book");
-
-    const pageFlip = new St.PageFlip(el, {
-      width: 600,          // single page “design” size
-      height: 850,         // keep portrait ratio
-      size: "stretch",     // IMPORTANT: fit to #book
-      autoSize: true,      // IMPORTANT: recalc on resize
-      showCover: true,
+    const pageFlip = new St.PageFlip(document.getElementById("book"), {
+      width: 1000,
+      height: 1414,          // portrait ratio
+      size: "stretch",
+      autoSize: true,
+      showCover: false,      // IMPORTANT: avoid cover/spread behavior
+      usePortrait: true,     // IMPORTANT: portrait = single-page
       mobileScrollSupport: false,
-      maxShadowOpacity: 0.4
+      maxShadowOpacity: 0.35
     });
 
     pageFlip.loadFromImages(images);
-
-    // make sure it recalculates after load (prevents cutoff on some screens)
     window.addEventListener("resize", () => pageFlip.update());
   </script>
 </body>
