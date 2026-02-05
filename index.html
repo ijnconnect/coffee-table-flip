@@ -3,45 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Flipbook</title>
+  <title>Square Flipbook</title>
   <style>
-    html, body { margin:0; height:100%; background:#111; }
-    body { display:grid; place-items:center; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #111;
+    }
 
-    /* Force a SINGLE portrait page footprint */
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    /* THIS MAKES THE BOOK SQUARE */
     #book {
-      width: min(92vw, 720px);          /* limit width so it cannot become a 2-page spread */
-      aspect-ratio: 1 / 1.414;          /* A-series portrait ratio */
-      height: auto;                      /* controlled by aspect-ratio */
+      width: min(90vw, 900px);   /* big but responsive */
+      aspect-ratio: 1 / 1;       /* PERFECT SQUARE */
+      height: auto;
     }
   </style>
 </head>
 <body>
   <div id="book"></div>
 
-  <!-- keep your current file, or if you already replaced it, leave it -->
   <script src="assets/page-flip.browser.js?v=999"></script>
   <script>
     const totalPages = 52;
 
     const images = Array.from({ length: totalPages }, (_, i) => {
       const n = String(i + 1).padStart(2, "0");
-      return `pages/page-${n}.jpg`; // or .png
+      return `pages/page-${n}.jpg`; // change to .png if needed
     });
 
-    function getBookSize() {
-      const el = document.getElementById("book");
-      const rect = el.getBoundingClientRect();
-      return { w: Math.floor(rect.width), h: Math.floor(rect.width * 1.414) };
-    }
-
     const el = document.getElementById("book");
-    const { w, h } = getBookSize();
+
+    // Get the square size from the container
+    const rect = el.getBoundingClientRect();
+    const size = Math.floor(rect.width); // width = height
 
     const pageFlip = new St.PageFlip(el, {
-      width: w,               // match container size
-      height: h,
-      size: "fixed",          // IMPORTANT: prevents weird stretching
+      width: size,      // SQUARE
+      height: size,     // SQUARE
+      size: "fixed",    // IMPORTANT: prevents stretching
       showCover: false,
       mobileScrollSupport: false,
       maxShadowOpacity: 0.35
@@ -49,7 +53,7 @@
 
     pageFlip.loadFromImages(images);
 
-    // Rebuild on resize so it stays single-page on all screens
+    // Rebuild on resize so it stays square on all screens
     let t;
     window.addEventListener("resize", () => {
       clearTimeout(t);
