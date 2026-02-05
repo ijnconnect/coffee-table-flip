@@ -5,60 +5,73 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Square Flipbook</title>
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      background: #111;
-    }
+    html, body { margin:0; height:100%; background:#111; }
+    body { display:grid; place-items:center; }
 
-    body {
-      display: grid;
-      place-items: center;
-    }
-
-    /* THIS MAKES THE BOOK SQUARE */
+    /* Square container */
     #book {
-      width: min(90vw, 900px);   /* big but responsive */
-      aspect-ratio: 1 / 1;       /* PERFECT SQUARE */
+      width: min(92vw, 900px);
+      aspect-ratio: 1 / 1;
       height: auto;
     }
+
+    /* Helps some browsers render sharper */
+    canvas { image-rendering: auto; }
   </style>
 </head>
 <body>
   <div id="book"></div>
 
-  <script src="assets/page-flip.browser.js?v=999"></script>
+  <script src="assets/page-flip.browser.js?v=1001"></script>
   <script>
     const totalPages = 52;
 
     const images = Array.from({ length: totalPages }, (_, i) => {
       const n = String(i + 1).padStart(2, "0");
-      return `pages/page-${n}.jpg`; // change to .png if needed
+      return `pages/page-${n}.jpg`;
     });
 
     const el = document.getElementById("book");
 
-    // Get the square size from the container
-    const rect = el.getBoundingClientRect();
-    const size = Math.floor(rect.width); // width = height
+    // Load first image to get its real pixel size
+    const probe = new Image();
+    probe.src = images[0];
+    probe.onload = () => {
+      // Use the real image pixel size (square book expected)
+      const imgW = probe.naturalWidth;
+      const imgH = probe.naturalHeight;
 
-    const pageFlip = new St.PageFlip(el, {
-      width: size,      // SQUARE
-      height: size,     // SQUARE
-      size: "fixed",    // IMPORTANT: prevents stretching
-      showCover: false,
-      mobileScrollSupport: false,
-      maxShadowOpacity: 0.35
-    });
+      // Fit inside container but avoid weird fractional scaling by snapping
+      const rect = el.getBoundingClientRect();
+      const scale = Math.min(rect.width / imgW, rect.height / imgH);
 
-    pageFlip.loadFromImages(images);
+      // Snap to a clean scale step to reduce "pecah"
+      const snappedScale = Math.floor(scale * 100) / 100; // 2 decimal snap
+      const w = Math.floor(imgW * snappedScale);
+      const h = Math.floor(imgH * snappedScale);
 
-    // Rebuild on resize so it stays square on all screens
-    let t;
-    window.addEventListener("resize", () => {
-      clearTimeout(t);
-      t = setTimeout(() => location.reload(), 200);
-    });
+      const pageFlip = new St.PageFlip(el, {
+        width: w,
+        height: h,
+        size: "fixed",            // IMPORTANT: no stretching
+        showCover: false,
+        mobileScrollSupport: false,
+        maxShadowOpacity: 0.35
+      });
+
+      pageFlip.loadFromImages(images);
+
+      // After render, force high-quality smoothing
+      setTimeout(() => {
+        document.querySelectorAll("canvas").forEach(c => {
+          const ctx = c.getContext("2d");
+          if (ctx) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+          }
+        });
+      }, 200);
+    };
   </script>
 </body>
 </html>
