@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Single Square Flipbook</title>
+  <title>Single Page Flipbook</title>
   <style>
     html, body { margin:0; height:100%; background:#111; }
     body { display:grid; place-items:center; }
 
-    /* FORCE SINGLE PAGE: keep it narrow enough so it can’t become a 2-page spread */
-    #book {
-      width: min(92vw, 520px);   /* <-- KEY: keep under ~600 */
-      aspect-ratio: 1 / 1;       /* square page */
+    /* Show ONE page only; keep it visually square on screen */
+    #book{
+      width: min(92vw, 520px);
+      aspect-ratio: 1 / 1;
       height: auto;
     }
   </style>
@@ -19,34 +19,30 @@
 <body>
   <div id="book"></div>
 
-  <script src="assets/page-flip.browser.js?v=4001"></script>
+  <script src="assets/page-flip.browser.js?v=6001"></script>
   <script>
-    // If you split spreads into L/R = 104 pages total
     const spreads = 52;
+
+    // Use the portrait-padded images to force single-page behaviour
     const images = [];
     for (let i = 1; i <= spreads; i++) {
       const n = String(i).padStart(2, "0");
-      images.push(`pages_split/page-${n}-L.jpg`);
-      images.push(`pages_split/page-${n}-R.jpg`);
+      images.push(`pages_one/page-${n}-L.jpg`);
+      images.push(`pages_one/page-${n}-R.jpg`);
     }
 
     const el = document.getElementById("book");
 
+    // Probe first image to set correct fixed size (no stretching)
     const probe = new Image();
     probe.src = images[0];
     probe.onload = () => {
       const imgW = probe.naturalWidth;
       const imgH = probe.naturalHeight;
 
-      // Keep square + no stretch: fit inside container
-      const rect = el.getBoundingClientRect();
-      const scale = Math.min(rect.width / imgW, rect.height / imgH);
-      const w = Math.floor(imgW * scale);
-      const h = Math.floor(imgH * scale);
-
       const pageFlip = new St.PageFlip(el, {
-        width: w,
-        height: h,
+        width: imgW,
+        height: imgH,
         size: "fixed",
         showCover: false,
         mobileScrollSupport: false,
