@@ -16,24 +16,30 @@
   <script>
     const totalPages = 52;
 
-    // Your files are page-01.jpg ... page-52.jpg
+    // Your files: page-01.jpg ... page-52.jpg
     const images = Array.from({ length: totalPages }, (_, i) => {
       const n = String(i + 1).padStart(2, "0");
-      return `pages/page-${n}.jpg`; // change to .png if you switch to PNG later
+      return `pages/page-${n}.jpg`;
     });
 
     const pageFlip = new St.PageFlip(document.getElementById("book"), {
       width: 1000,
-      height: 1414,          // portrait ratio
+      height: 1414,
       size: "stretch",
       autoSize: true,
-      usePortrait: true,     // ✅ forces single-page in portrait
-      showCover: false,      // ✅ avoids cover/spread behavior
+
+      // ✅ THIS is the key:
+      display: "single",
+
+      showCover: false,
       mobileScrollSupport: false,
       maxShadowOpacity: 0.35
     });
 
     pageFlip.loadFromImages(images);
+
+    // Force refresh layout (helps on first load)
+    setTimeout(() => pageFlip.update(), 50);
     window.addEventListener("resize", () => pageFlip.update());
   </script>
 </body>
