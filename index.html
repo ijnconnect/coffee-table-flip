@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="keywords" content="InstitutJantungNegara IJN NationalHeartInstitute FlagshipMedicalTourismHospitalProgramme">
-    <title>IJN Coffee Table Flipbook</title>
+    <title>IJN Coffee Table Book</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dflip@1.0.9/css/dflip.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dflip@1.0.9/css/themify-icons.min.css">
     
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background-color: #222; }
+        body, html { margin: 0; padding: 0; height: 100%; background-color: #1a1a1a; }
         #flipbook-container { height: 100vh; width: 100%; }
     </style>
 </head>
@@ -22,15 +22,16 @@
     <script src="https://cdn.jsdelivr.net/npm/dflip@1.0.9/js/dflip.min.js"></script>
 
     <script>
-        // This manually forces the flipbook to start
         $(document).ready(function () {
-            var pdfUrl = "document.pdf";
+            // WE ARE USING THE ABSOLUTE LINK HERE
+            var pdfUrl = "https://ijnconnect.github.io/coffee-table-flip/document.pdf";
+            
             var options = {
-                height: 2000,
-                duration: 800,
-                backgroundColor: "#222"
+                height: '100%',
+                backgroundColor: "#1a1a1a"
             };
-            var flipBook = $("#flipbook-container").flipBook(pdfUrl, options);
+            
+            $("#flipbook-container").flipBook(pdfUrl, options);
         });
     </script>
 
